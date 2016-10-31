@@ -3843,6 +3843,9 @@ namespace Nano.Web.Core
 
             /// <summary>The operation url path.</summary>
             public string UrlPath;
+
+            /// <summary>Optional metadata collection to allow for customized data for the operation.</summary>
+            public Dictionary<string, object> CustomMetaData = new Dictionary<string, object>();
         }
 
         /// <summary>Operation parameter.</summary>
