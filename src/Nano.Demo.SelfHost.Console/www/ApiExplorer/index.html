@@ -1529,7 +1529,7 @@ table.dataTable {width: 100%;margin: 0 auto;clear: both;border-collapse: separat
                     method = replaceAllOccurrences(method, "{{Summary}}", operationDescription);
                     if (operationDescription && operationDescription.trim() != "") {
                         method = replaceAllOccurrences(method, "{{AsyncSummary}}", "Asynchronously " + operationDescription.lowerCaseFirstLetter());
-                    }else {
+                    } else {
                         method = replaceAllOccurrences(method, "{{AsyncSummary}}", operationDescription);
                     }
 
@@ -1549,19 +1549,29 @@ table.dataTable {width: 100%;margin: 0 auto;clear: both;border-collapse: separat
                     method = replaceAllOccurrences(method, "{{UrlPath}}", operation.UrlPath);
 
                     var inputParameterList = "";
+                    var requiredInputParameterList = "";
+                    var optionalInputParameterList = "";
                     var parameterNameList = "";
+                    var requiredParameterNameList = "";
+                    var optionalParameterNameList = "";
                     var commentParameterList = "";
                     var nameValueCollectionParameterList = "";
 
                     for (var j = 0; j < operation.InputParameters.length; j++) {
                         var inputParameter = operation.InputParameters[j];
-                        inputParameterList += inputParameter.Type + " " + inputParameter.Name;
+
                         if (inputParameter.HasDefaultValue) {
+                            optionalInputParameterList += inputParameter.Type + " " + inputParameter.Name;
                             var defaultValue = ((inputParameter.Type === "String") && (inputParameter.DefaultValue !== null)) ? ('"' + inputParameter.DefaultValue + '"') : inputParameter.DefaultValue;
-                            inputParameterList += (" = " + defaultValue);
+                            optionalInputParameterList += (" = " + defaultValue);
+                            optionalInputParameterList += ", ";
+                            optionalParameterNameList += (inputParameter.Name + ", ");
+                        } else {
+                            requiredInputParameterList += inputParameter.Type + " " + inputParameter.Name;
+                            requiredInputParameterList += ", ";
+                            requiredParameterNameList += (inputParameter.Name + ", ");
                         }
-                        inputParameterList += ", ";
-                        parameterNameList += inputParameter.Name + ", ";
+
                         nameValueCollectionParameterList += '{"' + inputParameter.Name + '", Configuration.Serialize(' + inputParameter.Name + ')}, ';
 
                         var inputParameterDescription = "";
@@ -1570,9 +1580,8 @@ table.dataTable {width: 100%;margin: 0 auto;clear: both;border-collapse: separat
 
                         commentParameterList += '\n        /// <param name="{{ParameterName}}">{{Description}}</param>'.replace('{{ParameterName}}', inputParameter.Name).replace('{{Description}}', inputParameterDescription);
                     }
-
-                    inputParameterList += "object correlationId = null";
-                    parameterNameList += "correlationId";
+                    inputParameterList = requiredInputParameterList + optionalInputParameterList + "object correlationId = null";
+                    parameterNameList = requiredParameterNameList + optionalParameterNameList + "correlationId";
                     nameValueCollectionParameterList = nameValueCollectionParameterList === "" ? "" : nameValueCollectionParameterList.slice(0, -2); // Remove trailing comma
 
                     method = replaceAllOccurrences(method, "{{XmlCommentParameterList}}", commentParameterList);
